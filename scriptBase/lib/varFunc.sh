@@ -113,7 +113,8 @@ function rec_net_settings(){
     sudo ufw allow http
     sudo ufw allow https
     sudo ufw allow from 1.1.1.1 proto tcp to any port 53
-    sudo ufw allow from 1.0.0.1 proto tcp to any port 53 
+    sudo ufw allow from 1.0.0.1 proto tcp to any port 53
+    sudo ufw enable
 }
 
 #------------------------------------------------------
@@ -228,12 +229,12 @@ function rootkit_install() {
 
 function sys_mal_scan() {
 
-
+    sudo clamscan -r /
     echo -e "$INFO""Beginning scan with chkrootkit.""$END"
     touch "$log_location"/chkroot-scan_"$dateTime".txt
     sudo chkrootkit > "$log_location"/chkroot-scan_"$dateTime".txt
     echo -e "$GOOD""Scan with chkrootkit complete.""$END"
-
+    sudo rkhunter -c | tee "$log_location"/rkhunter-scan_"$dateTime".txt
 
 }
 
@@ -248,14 +249,13 @@ function fail2ban_install() {
 
 function root_acc_on() {
     echo  -e "$WARN" "Root account has been enabled. (Not Recommended)" "$END"
-    sudo passw -l root
+    sudo passw -u root
 }
 
-# left for testing, these functions are backwards.
 
 function root_acc_off() {
     echo -e "$GOOD""Root account has be locked.""$END"
-    sudo passwd -u root
+    sudo passwd -l root
 }
 
 #------------------------------------------------------
@@ -322,7 +322,20 @@ fi
 
 function create_sys_doc {
     touch "$log_location"/"$currentHost"-documentation_"$dateTime".txt
-    neofetch > "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    neofetch >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+
+    echo "Your system disks:-" >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    lsblk >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    echo "Disk usage:- " >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    df -h >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+
+    echo "Network Info: " >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    ip addr >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+
+    echo "Users: " >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    users >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    echo "Groups: " >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
+    groups >> "$log_location"/"$currentHost"-documentation_"$dateTime".txt
 
 }
 
